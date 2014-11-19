@@ -7,21 +7,19 @@
 #define ACK 0x02
 #define SYN 0x04
 #define FIN 0x08
-#define RST 0x1f
+#define RST 0x10
 
 using namespace std;
 
 class Packet
 {
   public:
-    Packet(unsigned int, unsigned int, unsigned int);
+    Packet(unsigned char, unsigned short, unsigned short);
     ~Packet();
 
 
     string GetContent();
     void SetContent(string);
-    string GetChecksum();
-    void SetChecksum(string);
 
     bool IsAck();
     bool IsDat();
@@ -30,11 +28,11 @@ class Packet
     bool IsSyn();
 
   private:
-    unsigned int flags;
-    unsigned int seqno;
-    unsigned int ackno;
-    unsigned int length;
-    string checksum;
+    unsigned char flags;
+    unsigned short seqno;
+    unsigned short ackno;
+    unsigned short window_size;
+    unsigned short payload_length;
     string content;
 };
 #endif

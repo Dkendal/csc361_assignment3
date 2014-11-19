@@ -1,7 +1,7 @@
 #include <string>
 #include "packet.h"
 
-Packet::Packet(unsigned int flags, unsigned int seqno, unsigned int ackno) :
+Packet::Packet(unsigned char flags, unsigned short seqno, unsigned short ackno) :
   flags(flags), seqno(seqno), ackno(ackno) {
 }
 
