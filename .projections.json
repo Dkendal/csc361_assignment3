@@ -1,0 +1,18 @@
+{
+  "*" : {
+    "dispatch": "make test && bin/test"
+  },
+  "test/*_test.cc" : {
+    "type": "test",
+    "alternate": "{}.cc",
+    "start": "make && GTEST_BREAK_ON_FAILURE=1 gdb ./bin/test"
+  },
+  "lib/*.h" : {
+    "type" : "header",
+    "alternate": "lib/{}.cc"
+  },
+  "lib/*.cc" : {
+    "type" : "lib",
+    "alternate" : "test/lib/{}_test.cc"
+  }
+}
