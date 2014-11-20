@@ -14,12 +14,16 @@ using namespace std;
 class Packet
 {
   public:
-    Packet(unsigned char, unsigned short, unsigned short);
+    Packet(const char *);
+    Packet(char, short, short, short);
     ~Packet();
-
 
     string GetContent();
     void SetContent(string);
+
+    int GetFlags();
+
+    int GetContentLength();
 
     bool IsAck();
     bool IsDat();
@@ -27,12 +31,16 @@ class Packet
     bool IsRst();
     bool IsSyn();
 
+    string ToStr();
+
+    short seqno;
+    short ackno;
+    short window_size;
+    string magic;
+
   private:
-    unsigned char flags;
-    unsigned short seqno;
-    unsigned short ackno;
-    unsigned short window_size;
-    unsigned short payload_length;
+    int flags;
+    short content_length;
     string content;
 };
 #endif

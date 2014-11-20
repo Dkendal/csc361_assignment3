@@ -1,5 +1,5 @@
 LDLIBS := -lgtest -lgtest_main -lpthread
-CXXFLAGS := -Wall -pedantic -g
+CXXFLAGS := -pedantic -g -std=c++98
 TEST_BIN := bin/test
 TEST_SRC := `ls test/lib/*`
 SRC := `ls lib/*`
