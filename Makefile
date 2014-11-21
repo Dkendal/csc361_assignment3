@@ -103,3 +103,5 @@ gmock_main.a : gmock-all.o gtest-all.o gmock_main.o
 
 %_test : %.o %_test.o gmock_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o ./bin/tests/$@
+
+rdp_listener_test: udp_socket.o

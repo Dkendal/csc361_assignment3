@@ -3,11 +3,21 @@
 #include "src/udp_socket.h"
 #include "src/packet.h"
 
+class MockUDPSocket : public UDPSocket {
+  public:
+    MockUDPSocket() : UDPSocket(0) {};
+    MOCK_METHOD2(Bind,
+        bool(std::string, std::string));
+    MOCK_METHOD3(RecvfromNonblock,
+        std::string(int maxlen, int flags, struct sockaddr *sender_inet_addr));
+    MOCK_METHOD2(Send,
+        int(std::string mesg, int flags));
+};
 
 using ::testing::Return;
 TEST(RDPListenerTest, StateTest)
 {
-  //MockUDPSocket sock;
+  MockUDPSocket sock;
 
   //RDPListener listener( ( (UDPSocket *) &sock ) );
   //Packet closed_to_syn_sent(SYN, 0, 0, 10240);
