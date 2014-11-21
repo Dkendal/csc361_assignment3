@@ -1,10 +1,9 @@
-#include <gtest/gtest.h>
-#include "../../lib/packet.h"
+#include "test/test_helper.h"
+#include "src/packet.h"
 
-class PacketTest : public ::testing::Test
+FIXTURE(PacketTest)
 {
-  protected:
-  virtual void SetUp()
+  SET_UP
   {
     p = new Packet( ACK | SYN | RST, 100, 1, 10240);
   }

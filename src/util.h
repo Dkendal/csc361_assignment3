@@ -5,5 +5,5 @@
 #include <stdio.h>
 #include <cstdlib>
 
-#define check(val) if(val != 0) { perror("#val: "); exit(EXIT_FAILURE); }
+#define check(val) if(val) { perror("#val: "); exit(EXIT_FAILURE); }
 #endif

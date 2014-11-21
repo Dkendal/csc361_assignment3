@@ -15,7 +15,8 @@ class Packet
 {
   public:
     Packet(const char *);
-    Packet(char, short, short, short);
+    Packet(int, int, int, int);
+    Packet(int, int, int, int, string);
     ~Packet();
 
     string GetContent();
@@ -33,9 +34,9 @@ class Packet
 
     string ToStr();
 
-    short seqno;
-    short ackno;
-    short window_size;
+    int seqno;
+    int ackno;
+    int window_size;
     string magic;
 
   private:

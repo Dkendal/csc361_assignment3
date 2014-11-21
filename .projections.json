@@ -1,18 +1,22 @@
 {
-  "*" : {
-    "dispatch": "make test && bin/test"
+  "test/mocks/mock_*.cc" : {
+    "type" : "mock",
+    "alternate" : "src/{}.h"
   },
-  "test/*_test.cc" : {
+  "test/src/*_test.cc" : {
     "type": "test",
-    "alternate": "{}.cc",
-    "start": "make && GTEST_BREAK_ON_FAILURE=1 gdb ./bin/test"
+    "alternate": "src/{}.cc",
+    "dispatch": "make {}_test && ./bin/tests/{}_test",
+    "start": "make {}_test && GTEST_BREAK_ON_FAILURE=1 gdb ./bin/tests/{}_test"
   },
-  "lib/*.h" : {
+  "src/*.h" : {
     "type" : "header",
-    "alternate": "lib/{}.cc"
+    "alternate": "src/{}.cc"
   },
-  "lib/*.cc" : {
-    "type" : "lib",
-    "alternate" : "test/lib/{}_test.cc"
+  "src/*.cc" : {
+    "type" : "src",
+    "alternate" : "test/src/{}_test.cc",
+    "dispatch": "make {}_test && ./bin/tests/{}_test",
+    "start": "make {}_test && GTEST_BREAK_ON_FAILURE=1 gdb ./bin/tests/{}_test"
   }
 }

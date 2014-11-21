@@ -5,16 +5,17 @@
 #include <iostream>
 #include <assert.h>
 
-Packet::Packet(char flags, short seqno,
-    short ackno, short window_size = 0) :
-  flags(flags),
-  seqno(seqno),
-  ackno(ackno),
-  window_size(window_size),
-  content_length(0),
-  content(""),
-  magic("UVicCSc361")
-{}
+Packet::Packet(int flags, int seqno, int ackno, int window_size) :
+  flags(flags), seqno(seqno), ackno(ackno), window_size(window_size), magic("UVicCSc361")
+{
+  SetContent("");
+}
+
+Packet::Packet(int flags, int seqno, int ackno, int window_size, string content = "") :
+  flags(flags), seqno(seqno), ackno(ackno), window_size(window_size), magic("UVicCSc361")
+{
+  SetContent(content);
+}
 
 Packet::~Packet() {}
 

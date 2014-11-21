@@ -1,0 +1,4 @@
+-I /usr/src/gmock-1.7.0/gtest/include
+-I /usr/src/gmock-1.7.0/include
+-I test
+-I ./
