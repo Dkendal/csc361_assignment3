@@ -70,3 +70,44 @@ TEST(RDPListenerTest, SuccessfulTransferTest) {
   RDPListener listener(&sock, "100.100.100.100", 9000);
   listener.Start();
 }
+
+TEST(RDPListenerTest, DroppedPacketTest) {
+  MockUDPSocket sock;
+
+  const char *target_addr = "123.123.123.123";
+  int port = 3000;
+
+  {
+    InSequence s;
+
+    EXPECT_CALL(sock, Bind(StrEq("100.100.100.100"), 9000)).WillOnce(Return(true));
+
+    //syn
+    StubRequest(&sock, "UVicCSc361 4 0 0 0 10240\n\n", target_addr, port);
+    //ack
+    EXPECT_CALL(sock, Send(StrEq("UVicCSc361 2 0 1 0 10240\n\n"), _, StrEq(target_addr), port));
+
+    //dat
+    StubRequest(&sock, "UVicCSc361 1 5 1 4 10240\n\n1234", target_addr, port);
+    //ack
+    EXPECT_CALL(sock, Send(StrEq("UVicCSc361 2 0 1 0 10240\n\n"), _, StrEq(target_addr), port));
+
+    //dat
+    StubRequest(&sock, "UVicCSc361 1 1 1 4 10240\n\ntest", target_addr, port);
+    //ack
+    EXPECT_CALL(sock, Send(StrEq("UVicCSc361 2 0 5 0 10240\n\n"), _, StrEq(target_addr), port));
+
+    //dat
+    StubRequest(&sock, "UVicCSc361 1 5 1 4 10240\n\n1234", target_addr, port);
+    //ack
+    EXPECT_CALL(sock, Send(StrEq("UVicCSc361 2 0 9 0 10240\n\n"), _, StrEq(target_addr), port));
+
+    //fin
+    StubRequest(&sock, "UVicCSc361 8 9 1 0 10240\n\n", target_addr, port);
+    //ack
+    EXPECT_CALL(sock, Send(StrEq("UVicCSc361 2 0 10 0 10240\n\n"), _, target_addr, port));
+  }
+
+  RDPListener listener(&sock, "100.100.100.100", 9000);
+  listener.Start();
+}

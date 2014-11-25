@@ -45,6 +45,8 @@ void RDPListener::Start()
   stringstream ss("");
   bool connected = true;
 
+  int their_seqno = 0, offset = 0;
+
   SenderInetAddr request = {};
 
   socket->Bind(this->addr, this->port);
@@ -59,19 +61,21 @@ void RDPListener::Start()
 
     Packet *response;
 
-    //TODO check for missing packets
-
-    if (req->IsSyn() || req->IsFin()) {
-      response = new Packet(ACK, 0, req->GetSeqno() + 1, 10240, "");
+    if (req->IsSyn()) {
+      their_seqno = req->GetSeqno();
     }
-    else if (req->IsDat()) {
+    if (req->IsSyn() || req->IsFin()) {
+      offset += 1;
+    }
+    else if (req->IsDat() &&
+        (req->GetSeqno() + req->GetContentLength() == their_seqno + offset + ss.tellp())) {
       ss << req->GetContent();
-      response = new Packet(ACK, 0, req->GetSeqno() + req->GetContentLength(),
-          10240, "");
     }
     if (req->IsFin()) {
       connected = false;
     }
+
+    response = new Packet(ACK, 0, their_seqno + offset + ss.tellp(), 10240, "");
 
     LogResponse(*response, request);
 
