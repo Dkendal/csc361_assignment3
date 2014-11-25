@@ -5,18 +5,11 @@ FIXTURE(PacketTest)
 {
   SET_UP
   {
-    p = new Packet( ACK | SYN | RST, 100, 1, 10240);
+    p = new Packet( ACK | SYN | RST, 100, 1, 10240, "");
   }
 
   Packet *p;
 };
-
-TEST_F(PacketTest, ConstructorTest)
-{
-  EXPECT_EQ(100, p->seqno);
-  EXPECT_EQ(1, p->ackno);
-  EXPECT_EQ(10240, p->window_size);
-}
 
 TEST_F(PacketTest, FlagsTest)
 {
@@ -41,11 +34,6 @@ TEST_F(PacketTest, ToStringTest)
 
 TEST(Packet, ParseTest)
 {
-  Packet p("UVicCSc361 22 100 1 0 10240\n\n");
-  EXPECT_EQ("UVicCSc361", p.magic);
-  EXPECT_EQ(22, p.GetFlags());
-  EXPECT_EQ(100, p.seqno);
-  EXPECT_EQ(1, p.ackno);
-  EXPECT_EQ(10240, p.window_size);
-  EXPECT_EQ(0, p.GetContentLength());
+  Packet p("UVicCSc361 22 100 1 0 10240\n\ntest");
+  EXPECT_EQ("UVicCSc361 22 100 1 0 10240\n\ntest",  p.ToStr());
 }

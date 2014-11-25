@@ -1,23 +1,29 @@
-#ifndef RDP_LISTENER_H
-#define RDP_LISTENER_H
+#ifndef SRC_RDP_LISTENER_H_
+#define SRC_RDP_LISTENER_H_
+#include <string>
 #include "listener_state.h"
 
-class UDPSocket;
+using namespace std;
 
-class RDPListener
-{
+class Packet;
+class UDPSocket;
+struct SenderInetAddr;
+class RDPListener {
   public:
-    RDPListener(UDPSocket *socket) : socket(socket) {};
+    RDPListener(UDPSocket *socket, const char *addr, int port);
     virtual ~RDPListener() {};
 
     Listener::State GetState();
     Listener::State IntialState();
     Listener::State NextState();
+    void LogRequest(SenderInetAddr request);
+    void LogResponse(Packet response, SenderInetAddr request);
     void Start();
 
   private:
     UDPSocket *socket;
-    Listener::State current_state;
+    const char *addr;
+    int port;
 };
 
 #endif

@@ -1,34 +1,72 @@
-#include "test_helper.h"
 #include "src/rdp_listener.h"
-#include "src/udp_socket.h"
+
+#include <arpa/inet.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+
+#include <sstream>
+
 #include "src/packet.h"
+#include "src/sender_inet_addr.h"
+#include "src/udp_socket.h"
+#include "test/test_helper.h"
+
+using ::testing::Return;
+using ::testing::_;
+using ::testing::InSequence;
+using ::testing::SetArgPointee;
+using ::testing::DoAll;
+using ::testing::StrEq;
+
 
 class MockUDPSocket : public UDPSocket {
   public:
-    MockUDPSocket() : UDPSocket(0) {};
+    MockUDPSocket() : UDPSocket(0) {}
     MOCK_METHOD2(Bind,
-        bool(std::string, std::string));
-    MOCK_METHOD3(RecvfromNonblock,
-        std::string(int maxlen, int flags, struct sockaddr *sender_inet_addr));
-    MOCK_METHOD2(Send,
-        int(std::string mesg, int flags));
+        bool(const char *addr, int port));
+    MOCK_METHOD2(RecvFrom,
+        void(int flags, SenderInetAddr *sender_addr));
+    MOCK_METHOD4(Send,
+        int(const char *mesg, int flags, const char *host, int port));
 };
 
-using ::testing::Return;
-TEST(RDPListenerTest, StateTest)
-{
+void StubRequest(MockUDPSocket *sock,
+    const char *request,
+    const char *addr,
+    int port) {
+  SenderInetAddr result = {};
+  result.content = request;
+  result.addr = addr;
+  result.port = port;
+  result.ai_family = AF_INET;
+
+  EXPECT_CALL(*sock, RecvFrom(_, _)).WillOnce(SetArgPointee<1>(result));
+}
+
+TEST(RDPListenerTest, SuccessfulTransferTest) {
   MockUDPSocket sock;
 
-  //RDPListener listener( ( (UDPSocket *) &sock ) );
-  //Packet closed_to_syn_sent(SYN, 0, 0, 10240);
-  //Packet syn_sent_to_established(ACK, 1, 1, 10240);
-  //Packet established(DAT, 1, 1, 10240, "test");
-  ////Packet established_to_fin_wait_1(FIN,
-  //Packet fin_wait_2_to_time_wait(ACK
+  const char *target_addr = "123.123.123.123";
+  int port = 3000;
 
-  // start listening
-  //listener.start();
-  // stub receive 1st part of 3 way hand shake
-  // expect send 2 nd part of 3 way hand shake
-  // stub receive 3 rd part of 3 way hand shake
+  {
+    InSequence s;
+
+    EXPECT_CALL(sock, Bind(StrEq("100.100.100.100"), 9000)).WillOnce(Return(true));
+
+    StubRequest(&sock, "UVicCSc361 4 0 0 0 10240\n\n", target_addr, port);
+    EXPECT_CALL(sock, Send(StrEq("UVicCSc361 2 0 1 0 10240\n\n"), _, StrEq(target_addr), port));
+
+    StubRequest(&sock, "UVicCSc361 1 1 1 4 10240\n\ntest", target_addr, port);
+    EXPECT_CALL(sock, Send(StrEq("UVicCSc361 2 0 5 0 10240\n\n"), _, StrEq(target_addr), port));
+
+    StubRequest(&sock, "UVicCSc361 1 5 1 4 10240\n\n1234", target_addr, port);
+    EXPECT_CALL(sock, Send(StrEq("UVicCSc361 2 0 9 0 10240\n\n"), _, StrEq(target_addr), port));
+
+    StubRequest(&sock, "UVicCSc361 8 9 1 0 10240\n\n", target_addr, port);
+    EXPECT_CALL(sock, Send(StrEq("UVicCSc361 2 0 10 0 10240\n\n"), _, target_addr, port));
+  }
+
+  RDPListener listener(&sock, "100.100.100.100", 9000);
+  listener.Start();
 }

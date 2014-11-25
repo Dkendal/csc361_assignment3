@@ -34,7 +34,7 @@ TEST_DIR = test/src
 CPPFLAGS += -isystem $(GTEST_DIR)/include -isystem $(GMOCK_DIR)/include -I test -I ./
 
 # Flags passed to the C++ compiler.
-CXXFLAGS += -g -Wall -Wextra -pthread
+CXXFLAGS += -g -pthread
 
 # All tests produced by this Makefile.  Remember to add new tests you
 # created to the list.
@@ -93,6 +93,7 @@ gmock.a : gmock-all.o gtest-all.o
 gmock_main.a : gmock-all.o gtest-all.o gmock_main.o
 	$(AR) $(ARFLAGS) $@ $^
 
+
 # build tests
 %.o : $(USER_DIR)/%.cc $(USER_DIR)/%.h $(GMOCK_HEADERS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $<
@@ -104,4 +105,4 @@ gmock_main.a : gmock-all.o gtest-all.o gmock_main.o
 %_test : %.o %_test.o gmock_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o ./bin/tests/$@
 
-rdp_listener_test: udp_socket.o
+rdp_listener_test: udp_socket.o packet.o
